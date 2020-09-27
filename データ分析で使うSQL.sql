@@ -87,30 +87,42 @@ order by
 -- ------------------------------------------
 
 select 
-  ord.product_id
+  year(ord.order_date) as yr
+  , month(ord.order_date) as mth
+  , count(*) as cnt
   , sum(ord.order_amt) as order_amt
-from
+  , min(ord.order_amt) as min_order_amt
+  , max(ord.order_amt) as max_order_amt
+  , avg(ord.order_amt) as avg_order_amt
+from 
   sales_orders ord
-where
-  order_date = '2020-09-04'
 group by
-  ord.product_id
+  year(ord.order_date)
+  , month(ord.order_date)
 having 
-  sum(ord.order_amt) >= 30000
+  count(*) between 500 and 1000
 ;
 
 -- ------------------------------------------
 -- CASE
 -- ------------------------------------------
 
-select
-    year(a.order_date) as yr
-  , sum(a.order_amt) as order_amt
-  , sum(a.order_qty) as order_qty
-from
-  sales_orders a
+select 
+  year(ord.order_date) as yr
+  , month(ord.order_date) mth
+  , sum(ord.order_amt) as order_amt
+  , sum(ord.order_qty) as order_qty
+  , case when sum(ord.order_amt) >= 20000000 then 'VERY GOOD' 
+    else case when sum(ord.order_amt) >= 10000000 then 'GOOD'
+    else 'SO-SO' end end as performance_desc
+from 
+  sales_orders ord
 group by
-    year(a.order_date)
+  year(ord.order_date)
+  , month(ord.order_date)
+order by
+  year(ord.order_date)
+  , month(ord.order_date)
 ;
 
 select
